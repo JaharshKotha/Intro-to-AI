@@ -1,2 +1,2 @@
-# IntotoAI
+# IntrotoAI
 AI projects
