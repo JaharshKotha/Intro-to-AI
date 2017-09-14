@@ -88,77 +88,140 @@ def depthFirstSearch(problem):
     """
     "*** YOUR CODE HERE ***"
     import util
-    stack=util.Stack()
+    stack = util.Stack()
     start_state = problem.getStartState()
-    if(problem.isGoalState(start_state)):
+    if (problem.isGoalState(start_state)):
         return None
-    flg =0
-    level =1
+    flg = 0
     res = []
     visited = set()
-    temp=[]
-    prev = None
-
+    visited.add(start_state)
     for i in problem.getSuccessors(start_state):
-        i+=(level,)
-        prev = i
-        stack.push(i)
-
-    start_state += (0,)
-    start_state += (0,)
-    t =start_state
-    print t
+        tem = [i[0], i[1]]
+        stack.push(tem)
 
     while not stack.isEmpty():
-       # print res
-        prev = t
-        t=stack.pop()
+        t = stack.pop()
         visited.add(t[0])
-        if(prev[3] >= t[3]):
-            cut = (len(res)-t[3]+1)
-            print "inside cut"
-            print cut
-            del res[-cut:]
 
-        res.append(t[1])
         if (problem.isGoalState(t[0])):
-            print "GOAl"
-            print t[0]
-            flg=1
+            res = t[1]
+            flg = 1
             break
         else:
-            l_flg =0
+
             for j in problem.getSuccessors(t[0]):
                 if j[0] not in visited:
-                    if l_flg == 0:
-                        l_flg=1
-                        level = level +1
-                    j+=(level,)
-                    #print j
-                    stack.push(j)
+                    ltem = t[1] + "," + j[1]
+                    stack.push([j[0], ltem])
 
-
-    if flg==1:
-        print "this is res"
-        print res
-        return res
+    final = []
+    if flg == 1:
+        data = res.split(",")
+        for temp in data:
+            final.append(temp)
+        return final
     else:
         return None
-
-
-
-
 
 
 def breadthFirstSearch(problem):
     """Search the shallowest nodes in the search tree first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    import util
+    queue = util.Queue()
+    start_state = problem.getStartState()
+    if (problem.isGoalState(start_state)):
+        return None
+    flg = 0
+    res = []
+    visited = set()
+    visited.add(start_state)
+    many_paths = set()
+    many_paths.add(start_state)
+    for i in problem.getSuccessors(start_state):
+        tem = [i[0], i[1]]
+        queue.push(tem)
+        many_paths.add(i[0])
+
+    while not queue.isEmpty():
+        t = queue.pop()
+        visited.add(t[0])
+
+        if (problem.isGoalState(t[0])):
+            res = t[1]
+            flg = 1
+            break
+        else:
+
+            for j in problem.getSuccessors(t[0]):
+                if j[0] not in visited and j[0] not in many_paths:
+                    ltem = t[1] + "," + j[1]
+                    queue.push([j[0], ltem])
+                    many_paths.add(j[0])
+
+    final = []
+    if flg == 1:
+        data = res.split(",")
+        for temp in data:
+            final.append(temp)
+        return final
+    else:
+        return None
+
+
 
 def uniformCostSearch(problem):
     """Search the node of least total cost first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    import util
+    priority_queue = util.PriorityQueue()
+    start_state = problem.getStartState()
+    if (problem.isGoalState(start_state)):
+        return None
+    flg = 0
+    res = []
+    visited = set()
+    visited.add(start_state)
+    many_paths = set()
+    many_paths.add(start_state)
+    for i in problem.getSuccessors(start_state):
+        tem = [i[0],i[1],i[2]]
+        priority_queue.push(tem,i[2])
+        many_paths.add(i[0])
+
+
+    while not priority_queue.isEmpty():
+        if flg==1:
+            break
+        t = priority_queue.pop()
+        if t[0] in visited:
+            t = priority_queue.pop()
+        visited.add(t[0])
+
+        if (problem.isGoalState(t[0])):
+            res = t[1]
+            flg = 1
+            break
+        else:
+            #print "inside succ"
+            for j in problem.getSuccessors(t[0]):
+                if j[0] not in visited :
+                    ltem = t[1] + "," + j[1]
+                    cost = t[2]+j[2]
+                    #print j
+                    priority_queue.push([j[0], ltem,cost],cost)
+                    many_paths.add(j[0])
+
+    final = []
+    if flg == 1:
+        data = res.split(",")
+        for temp in data:
+            final.append(temp)
+        return final
+    else:
+        return None
+
 
 def nullHeuristic(state, problem=None):
     """
@@ -170,7 +233,50 @@ def nullHeuristic(state, problem=None):
 def aStarSearch(problem, heuristic=nullHeuristic):
     """Search the node that has the lowest combined cost and heuristic first."""
     "*** YOUR CODE HERE ***"
-    util.raiseNotDefined()
+    import util
+    priority_queue = util.PriorityQueue()
+    start_state = problem.getStartState()
+    if (problem.isGoalState(start_state)):
+        return None
+    flg = 0
+    res = []
+    visited = set()
+    visited.add(start_state)
+    many_paths = set()
+    many_paths.add(start_state)
+    for i in problem.getSuccessors(start_state):
+        tem = [i[0], i[1], i[2]]
+        initial_cost = i[2] + heuristic(i[0], problem)
+        priority_queue.push(tem, initial_cost)
+        many_paths.add(i[0])
+
+    while not priority_queue.isEmpty():
+        t = priority_queue.pop()
+        if t[0] in visited:
+            continue
+        visited.add(t[0])
+
+        if (problem.isGoalState(t[0])):
+            res = t[1]
+            flg = 1
+            break
+        else:
+            for j in problem.getSuccessors(t[0]):
+                if j[0] not in visited:
+                    ltem = t[1] + "," + j[1]
+                    cost = heuristic(j[0], problem) + j[2] + t[2]
+                    temp_cost = j[2]+t[2]
+                    priority_queue.push([j[0], ltem, temp_cost], cost)
+                    many_paths.add(j[0])
+    print len(visited)
+    final = []
+    if flg == 1:
+        data = res.split(",")
+        for temp in data:
+            final.append(temp)
+        return final
+    else:
+        return None
 
 
 # Abbreviations
